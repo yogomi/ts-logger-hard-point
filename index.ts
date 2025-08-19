@@ -3,13 +3,14 @@
  * JSON 構造ログ出力（1 行 1 JSON）。
  * 既存利用箇所との後方互換 (logger.error(...)) を維持。
  */
-import util from 'node:util';
+import * as util from 'node:util';
 
 export const PRIORITY = {
   error: 0,
   warn: 1,
   info: 2,
   debug: 3,
+  trace: 4,
 } as const;
 
 export type PriorityKey = keyof typeof PRIORITY;
@@ -65,7 +66,7 @@ function normalize(value: unknown): { msg: string; stack?: string } {
 }
 
 function isPriority(v: number): v is PriorityValue {
-  return v === 0 || v === 1 || v === 2 || v === 3;
+  return v === 0 || v === 1 || v === 2 || v === 3 || v === 4;
 }
 
 function log(level: PriorityKey, value: unknown, meta?: BaseMeta) {
@@ -84,7 +85,7 @@ function log(level: PriorityKey, value: unknown, meta?: BaseMeta) {
 export const logger = {
   /**
    * ログレベル設定。
-   * number を受けた場合は 0|1|2|3 か判定してから反映。
+   * number を受けた場合は 0|1|2|3|4 か判定してから反映。
    */
   setLogLevel(p: number | PriorityValue) {
     if (isPriority(p)) {
@@ -108,6 +109,9 @@ export const logger = {
   },
   debug(value: unknown, meta?: BaseMeta) {
     log('debug', value, meta);
+  },
+  trace(value: unknown, meta?: BaseMeta) {
+    log('trace', value, meta);
   },
 };
 
